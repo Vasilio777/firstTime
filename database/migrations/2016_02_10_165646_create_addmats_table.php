@@ -20,8 +20,6 @@ class CreateAddmatsTable extends Migration
         });
     }
 
-//$table->increments('id');
-//$table->string('dtitle');
     /**
      * Reverse the migrations.
      *

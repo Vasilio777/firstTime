@@ -10,6 +10,9 @@ class Course extends \Eloquent
     protected $fillable = [
 
         'coursetitle',
-        'cdesc'
+        'cdesc',
+        'requirements',
+        'forWhom',
+        'image'
     ];
 }

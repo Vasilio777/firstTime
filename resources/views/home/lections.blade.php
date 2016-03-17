@@ -1,112 +1,182 @@
 @extends('app')
 
+@section('header')
+
+    <span>{{ $chosencourse->coursetitle }}</span>
+
+    <a href="{{ route('courses') }}">Курсы</a>
+
+    <a href="{{ action('AdvancedReg@logout') }}">
+        @if ( Auth::check() )
+            {{ $usaName }}
+        @endif
+    </a>
+@stop
+
 @section('lections')
 
-    <header class="header">
-        <div>
-            Меню выбора лекций
-        </div>
-    </header>
+   <div class="topBlueLine">
+        Ознакомьтесь с описанием курса и приступите к изучению материала
+   </div>
 
-    <nav>
-        <ul>
-            <li>
-                <a href="{{ route('courses') }}">Курсы</a>
-            </li>
-
-            <li>
-                @if ( Auth::check() )
-                    {{ $usaName }}
-                @endif
-                <a href="{{ action('AdvancedReg@logout') }}">(Выход)</a>
-            </li>
-        </ul>
-    </nav>
-
-    <div class="nCourse">
-        <div class="nCourseLogo">
-            <div class="onliOneCourse">
-                <a class="plate" href="{{ action('HomeController@addLogo') }}">
-                    <img src="{{ URL::asset('images/icon/AddCompomemt.png') }}" alt="Изображение недоступно">
-                </a>
-            </div>
-        </div>
-
-        <div class="newcoursecontent">
-            @foreach($lections as $lection)
-                @if( $lection->idcourse == $chosencourse->id)
-                    <a href="/lections/{{ $lection->id }}">{{ $lection->ltitle }}</a>
-                    <div>
-                        {{ $lection->ldesc }}
+    <div class="backDiv">
+        <div class="oneCourseWrapper">
+            <div class="courseDesc">
+                <div class="onliOneCourse">
+                    <div class="plate">
+                        <img src="{{ URL::asset('images/icon/'.$chosencourse->image) }}" alt="Изображение отсутствует">
                     </div>
-                @endif
-            @endforeach
+                </div>
 
-        @if ($usachek == 1)
-                <ul id="otherContent" class="accordion">
-                    <!--        ВИДЕО  ------------------------------------------------>
-                    <li>
-                        <div class="link">Видеоматериалы</div>
+                <div class="course_desc">
+                    <div class="lightGrayLine">Описание курса:</div>
+                    <div class="underGrayLine">
+                        <div>{{ $chosencourse->cdesc }}</div>
 
-                        <ul class="submenu">
+                        @if ($usachek == 1)
+                            <div>
+                                <button class="button buttonchange" type="submit">Редактирование описания курса</button>
+                                <form class="changeForm" action="{{ action('HomeController@changeCourseDesc', ['id' => $chosencourse->id]) }}" method="post">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <textarea name="cdesc" rows="5">{{ $chosencourse->cdesc }}</textarea>
+                                    <button class="button" type="submit">Изменить описание курса</button>
+                                </form>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
 
-                            @if ($usachek == 1)
-                                <li>
-                                    <div class="mainOtherContent">
+            <div>
+                <div class="lightGrayLine">Требования к слушателю:</div>
+                <div class="underGrayLine">
+                    <div>{{ $chosencourse->requirements }}</div>
 
-                                        <form id="add_video" action="{{ action('HomeController@addVideo') }}" method="post" enctype="multipart/form-data">
-                                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                            <input {{--}}multiple="multiple"--}} name="videofile{{--[]--}}" type="file">
-                                            <button class="button" type="submit">Добавить новое видео</button>
-                                        </form>
+                    @if ($usachek == 1)
+                        <div>
+                            <button class="button buttonchange" type="submit">Редактирование требований к слушателю</button>
+                            <form class="changeForm" action="{{ action('HomeController@changeCourseReq', ['id' => $chosencourse->id]) }}" method="post">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <textarea name="requirement" rows="5">{{ $chosencourse->requirements }}</textarea>
+                                <button class="button" type="submit">Изменить требования</button>
+                            </form>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div>
+                <div class="lightGrayLine">Для кого предназначен курс:</div>
+                <div class="underGrayLine">
+                    <div>{{ $chosencourse->forWhom }}</div>
+                    @if ($usachek == 1)
+                        <div>
+                            <button class="button buttonchange" type="submit">Редактирование ареала слушателей</button>
+                            <form class="changeForm" action="{{ action('HomeController@changeCourseWhom', ['id' => $chosencourse->id]) }}" method="post">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <textarea name="whom" rows="5">{{ $chosencourse->forWhom }}</textarea>
+                                <button class="button" type="submit">Изменить ареал слушателей</button>
+                            </form>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="lections">
+                <div class="lightGrayLine"> Видеоуроки:</div>
+                @foreach($lections as $index => $lection)
+                    @if( $lection->idcourse == $chosencourse->id)
+                        <div class="lectionInCourse">
+                            <video controls>
+                                <source src="{{ URL::asset('gruntFiles/videos/'.$lection->ltitle) }}" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+                                <source src="{{ URL::asset('gruntFiles/videos/'.$lection->ltitle) }}" type='video/ogg; codecs="theora, vorbis"'>
+                                <source src="{{ URL::asset('gruntFiles/videos/'.$lection->ltitle) }}" type='video/webm; codecs="vp8, vorbis"'>
+                            </video>
+
+                            <div class="lectionContent">
+                                <span class="darkGrayLine">
+                                   {{ substr($lection->ltitle, 0, strripos($lection->ltitle, '.')) }}
+                                </span>
+
+                                <div class="underGrayLine">
+                                    <div>
+                                        <div>
+                                            {{ $lection->ldesc }}
+                                        </div>
+
+                                        @if ($usachek == 1)
+                                            <div>
+                                                <button class="button buttonchange" type="submit">Редактирование описания видеоурока</button>
+                                                <form class="changeForm" action="{{ action('HomeController@changeLecDesc', ['id' => $lection->id]) }}" method="post">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                    <textarea name="comment" rows="5">{{ $lection->ldesc }}</textarea>
+                                                    <button class="button" type="submit">Изменить описание</button>
+                                                </form>
+                                            </div>
+
+                                        @endif
                                     </div>
-                                </li>
-                            @endif
 
-                        </ul>
-                    </li>
+                                    {{--Metod--}}
+                                    @foreach($addmats as $addmat)
+                                        @if($addmat->idaddlec == $lection->id)
+                                            <div class="addmat">
+                                                <a href="{{URL::asset('gruntFiles/addmats/'.$addmat->addtitle)}}">{{ substr($addmat->addtitle, 0, strripos($addmat->addtitle, '.'))  }}</a>
 
-                    <!--          МЕТОДИЧКА --------------------------------------->
-                    <li>
-                        <div class="link">Методические указания</div>
+                                                @if ($usachek == 1)
+                                                    <form onsubmit="return confirm('Файл будет безвозвратно удалён. Вы уверены?')" action="{{ action('HomeController@deleteTableRecord', ['id' => $addmat->id]) }}" method="post">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                        <input type="hidden" name="name" value="{{ $addmat->addtitle }}">
+                                                        <button class="button" type="submit">Удалить документ</button>
+                                                    </form>
+                                                @endif
 
-                        <ul class="submenu">
+                                            </div>
+                                        @endif
+                                    @endforeach
 
-                            @if ($usachek == 1)
-                                <li>
-                                    <div class="mainOtherContent">
+                                    @if ($usachek == 1)
+                                        <div>
+                                            <form class="add_method" action="{{ action('HomeController@addTableRecord', ['id' => $lection->id]) }}" method="post" enctype="multipart/form-data">
+                                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                <input {{--multiple="multiple"--}} name="userfile" type="file">
+                                                <button class="button" type="submit">Добавить новый документ</button>
+                                            </form>
+                                        </div>
 
-                                        <form id="add_method" action="{{ action('HomeController@addTableRecord') }}" method="post" enctype="multipart/form-data">
+                                        <form onsubmit="return confirm('Видеурок будет безвозвратно удалён. Вы уверены?')" action="{{ action('HomeController@deleteLection', ['id' => $lection->id]) }}" method="post">
                                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                            <input {{--}}multiple="multiple"--}} name="userfile{{--[]--}}" type="file">
-                                            <button class="button" type="submit">Добавить новый документ</button>
+                                            <input type="hidden" name="name" value="{{ $lection->ltitle }}">
+                                            <button class="button" type="submit">Удалить видеурок</button>
                                         </form>
-                                    </div>
-                                </li>
-                            @endif
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
 
-                        </ul>
-                    </li>
+            @if(Session::has('message'))
 
-                </ul>
+                <div class="alertMessaga">
+                    {!!Session::get('message')!!}
+                </div>
+            @endif
 
-                <form class="changeForm" action="{{ action('HomeController@addLection') }}" method="post">
+            @if ($usachek == 1)
+                <button class="greenButton buttonLecChange" type="submit">Новый видеурок</button>
+                <form id="add_video" class="changeLecForm" action="{{ action('HomeController@addLection', ['id' => $chosencourse->id]) }}" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <ul class="input-group form-control">
-                        <li>
-                            <input type="text"  name="ltitle" placeholder="Введите название новой лекции" required>
-                        </li>
-
-                        <li>
-                            <textarea rows="5" name="ldesc" placeholder="Введите описание для новой лекции" required></textarea>
-                        </li>
+                        <li><input type="text" id="lalala" name="ltitle" placeholder="Название видеурока" required></li>
+                        <li><textarea rows="5" name="ldesc" placeholder="Описание видеурока" required></textarea></li>
                     </ul>
-                    <button type="submit" class="newcourseButtons">Добавить лекцию</button>
+                    <input {{--multiple="multiple"--}} name="videofile{{--[]--}}" type="file" accept="video/*">
+                    <button type="submit" class="greenButton">Добавить видеоурок</button>
                 </form>
-            </div>
-        @endif
+            @endif
+        </div>
     </div>
 
 @stop
-
-

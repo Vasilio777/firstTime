@@ -10,14 +10,28 @@
 </head>
 
 <body>
-
-    @yield('index')
     {{--@yield('regist')--}}
+    <div class="from_hell_with_love">
+        <header>
+            <span>
+                Интерактивный образовательный портал/
+            </span>
+            @yield('header')
 
-    @yield('courses')
-    @yield('newcourse')
-    @yield('lections')
+        </header>
 
+
+        @yield('index')
+        @yield('courses')
+        @yield('newcourse')
+        @yield('lections')
+        @yield('buttons')   {{-- chosenlections --}}
+
+        <footer>
+            <div>Copyright 2016 InnovateDesignTechnologies</div>
+            <div>Full stack developer - Vasiliy Kotunov</div>
+        </footer>
+    </div>
     <script type="text/javascript" src="{{ URL::asset('js/jquery-1.12.0.js') }}"></script>
     <script type="text/javascript" src="{{ URL::asset('js/test.js') }}"></script>
 </body>

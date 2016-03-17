@@ -6,7 +6,6 @@ use App\Models\Course;
 use App\Models\Addmat;
 use App\Models\Lection;
 use App\Models\User;
-use App\Models\Video;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 
@@ -41,110 +40,209 @@ class HomeController extends Controller
     }
     public function addCourse(Request $request)
     {
-//        $whitelist = [".jpg", ".jpeg", ".png", ".gif"];
-//        foreach ($whitelist as $item) {
-//            if(preg_match("/$item\$/i", $_FILES['logofile']['name'])) {
-//                exit;
-//            }
-//        }
-
         if (\Auth::check()) {
             $new = new Course();
             $new->coursetitle = $request->coursetitle;
             $new->cdesc = $request->cdesc;
             $new->requirements = $request->requirements;
             $new->forWhom = $request->forWhom;
-//            $new->image = $request->logofile;
+            $new->image = $request->logofile;
             $new->save();
-
-            return \Redirect::to('courses');
+            $id = $new->id;
+            return \Redirect::to('course'.$id.'/lections');
         }
 
         return $this->index();
     }
     public function addLogo() {
 
-        return  view('newplate');
+        $filename = $_FILES['logofile']['name'];
+        $uploaddir = public_path().'/images/icon/';
+        $whitelist = [".jpg", ".jpeg", ".png", ".gif"];
+        foreach ($whitelist as $item) {
+            if(preg_match("/$item\$/i", $_FILES['logofile']['name'])) {
+                move_uploaded_file($_FILES['logofile']['tmp_name'], $uploaddir.basename(mb_convert_encoding($filename, 'Windows-1251')));
+
+                return  view('newplate');
+            }
+        }
+    }
+    public function changeCourseDesc ($id, Request $request)
+    {
+        if (\Auth::check()) {
+            $newLecDesc = $request->get('comment', -1);
+            $desc = Lection::findorFail($id);
+            $desc->ldesc = $newLecDesc;
+            $desc->save();
+
+            return back();
+        }
+
+        return $this->index();
+    }
+    public function changeCourseReq ($id, Request $request)
+    {
+        if (\Auth::check()) {
+            $newLecDesc = $request->get('comment', -1);
+            $desc = Lection::findorFail($id);
+            $desc->ldesc = $newLecDesc;
+            $desc->save();
+
+            return back();
+        }
+
+        return $this->index();
+    }
+    public function changeCourseWhom ($id, Request $request)
+    {
+        if (\Auth::check()) {
+            $newLecDesc = $request->get('comment', -1);
+            $desc = Lection::findorFail($id);
+            $desc->ldesc = $newLecDesc;
+            $desc->save();
+
+            return back();
+        }
+
+        return $this->index();
     }
 
+    public function addLection(Request $request)
+    {
+        if (\Auth::check()) {
+
+            $file = $request->file('videofile');
+            $filename = $file->getClientOriginalName();
+            $file_type = substr($filename, strrpos($filename, '.')+1);
+            $ltitle = $request->ltitle;
+            $newname = $ltitle.'.'.$file_type;
+
+            $whitelist = [".mp4", ".webm", ".ogv", ".mpeg"];
+            foreach ($whitelist as $item) {
+                if(preg_match("/$item\$/i", $_FILES['videofile']['name'])) {
+                    $file->move('gruntFiles/videos', mb_convert_encoding($newname, 'Windows-1251'));
+
+                    $new = new Lection();
+                    $new->ltitle = $newname;
+                    $new->idcourse = $request->id;
+                    $new->ldesc = $request->ldesc;
+                    $new->save();
+
+                    return back()->with('message', 'Лекция успешно добавлена.');
+                }
+            }
+
+            return back()->with('message', 'Выберите видеофайл(Поддерживаемые форматы: mp4, webm, ogv, mpeg)');
+        }
+
+        return $this->index();
+    }
     public function lections($id)
     {
         if (\Auth::check()) {
             $chosencourse = Course::findorFail($id);
             $lections = Lection::all();
+//            $videos = Video::all();
+            $addmats = Addmat::all();
             $usaName =  \Auth::user()->name;
             $usachek = \Auth::user()->isPrepod;
 
-            return view('home.lections', ['usaName' => $usaName,  'usachek' => $usachek, 'chosencourse' => $chosencourse, 'lections' => $lections]);
+            return view('home.lections', ['usaName' => $usaName, 'usachek' => $usachek, 'chosencourse' => $chosencourse, 'lections' => $lections, 'addmats' => $addmats /*, 'videos' => $videos*/]);
         }
 
         return $this->index();
     }
-    public function addLection($id, Request $request)
+    public function changeLecDesc ($id, Request $request)
     {
         if (\Auth::check()) {
-        $new = new Lection();
-        $new->ltitle = $request->ltitle;
-        $new->idcourse = $request->id;
-        $new->ldesc = $request->ldesc;
-        $new->save();
+            $newLecDesc = $request->get('comment', -1);
+            $desc = Lection::findorFail($id);
+            $desc->ldesc = $newLecDesc;
+            $desc->save();
 
-        return \Redirect::to('course'.$id.'/lections');
+            return back();
         }
 
         return $this->index();
     }
-    public function chosenlections($id)
+    public function deleteLection($id, Request $request)
     {
         if (\Auth::check()) {
-        $chosenlections = Lection::findorFail($id);
-        $addmats = Addmat::all();
-        $videos = Video::all();
-        $usaName =  \Auth::user()->name;
-        $usachek = \Auth::user()->isPrepod;
-        return view('home.chosenlections', ['usaName' => $usaName, 'usachek' => $usachek, 'id' => $id, 'chosenlections' => $chosenlections, 'addmats' => $addmats, 'videos' => $videos]);
+            $abc = $request->get('name', -1);
+            $delrec = Lection::findorFail($id);
+            $delrec->delete();
+            \File::delete(public_path().'/gruntFiles/videos/'.(mb_convert_encoding($abc, 'Windows-1251')));
+
+            return back();
         }
 
         return $this->index();
     }
+//    public function chosenlections($id)
+//    {
+//        if (\Auth::check()) {
+//            $chosenlections = Lection::findorFail($id);
+//            $addmats = Addmat::all();
+//            $videos = Video::all();
+//            $usaName =  \Auth::user()->name;
+//            $usachek = \Auth::user()->isPrepod;
+//
+//            return view('home.chosenlections', ['usaName' => $usaName, 'usachek' => $usachek, 'id' => $id, 'chosenlections' => $chosenlections, 'addmats' => $addmats, 'videos' => $videos]);
+//        }
+//
+//        return $this->index();
+//    }
 
 //    public function regist()
 //    {
 //        return view('home.regist');
 //    }
 
-    public function addVideo($id, Request $request)
-    {
-        if (\Auth::check()) {
-        $file = $request->file('videofile');
-        $filename = $file->getClientOriginalName();
-        $vRec = new Video();
-        $vRec->idvlec = $id;
-        $vRec->vtitle = $filename;
-        $vRec->vdesc = "Описание";
-        $vRec->save();
-        $vRec->pid = $vRec->id;
-        $vRec->save();
-        $file->move('gruntFiles/videos', mb_convert_encoding($filename, 'Windows-1251'));
-
-        return \Redirect::to('lections/'.$id);
-        }
-
-        return $this->index();
-    }
-    public function deleteVideo($id, Request $request)
-    {
-        if (\Auth::check()) {
-        $abc = $request->get('name', -1);
-        $delrec = Video::findorFail( $request->get('id', '-1'));
-        $delrec->delete();
-        \File::delete(public_path().'/gruntFiles/videos/'.(mb_convert_encoding($abc, 'Windows-1251')));
-
-        return \Redirect::to('lections/'.$id);
-        }
-
-        return $this->index();
-    }
+//    public function addVideo($id, Request $request)
+//    {
+//        if (\Auth::check()) {
+//            $file = $request->file('videofile');
+//            $filename = $file->getClientOriginalName();
+//            $vRec = new Video();
+//            $vRec->idvlec = $id;
+//            $vRec->vtitle = $filename;
+//            $vRec->vdesc = "Описание";
+//            $vRec->save();
+//            $vRec->pid = $vRec->id;
+//            $vRec->save();
+//            $file->move('gruntFiles/videos', mb_convert_encoding($filename, 'Windows-1251'));
+//
+//            return \Redirect::to('lections/'.$id);
+//        }
+//
+//        return $this->index();
+//    }
+//    public function deleteVideo($id, Request $request)
+//    {
+//        if (\Auth::check()) {
+//        $abc = $request->get('name', -1);
+//        $delrec = Video::findorFail( $request->get('id', '-1'));
+//        $delrec->delete();
+//        \File::delete(public_path().'/gruntFiles/videos/'.(mb_convert_encoding($abc, 'Windows-1251')));
+//
+//        return \Redirect::to('lections/'.$id);
+//        }
+//
+//        return $this->index();
+//    }
+//    public function changeVideoDesc ($id, Request $request)
+//    {
+//        if (\Auth::check()) {
+//            $newVideoDesc = $request->get('comment', -1);
+//
+//            $desc = Video::findorFail($request->get('id', '-1'));
+//            $desc->vdesc = $newVideoDesc;
+//            $desc->save();
+//            return \Redirect::to('lections/'.$id);
+//        }
+//
+//        return $this->index();
+//    }
 
 //    public function incremVideo($id, Request $request)
 //    {
@@ -180,15 +278,15 @@ class HomeController extends Controller
     public function addTableRecord($id, Request $request)
     {
         if (\Auth::check()) {
-        $file = $request->file('userfile');
-        $filename = $file->getClientOriginalName();
-        $addRec = new Addmat();
-        $addRec->idaddlec = $id;
-        $addRec->addtitle = $filename;
-        $addRec->save();
-        $file->move('gruntFiles/addmats', mb_convert_encoding($filename, 'Windows-1251'));
+            $file = $request->file('userfile');
+            $filename = $file->getClientOriginalName();
+            $addRec = new Addmat();
+            $addRec->idaddlec = $id;
+            $addRec->addtitle = $filename;
+            $addRec->save();
+            $file->move('gruntFiles/addmats', mb_convert_encoding($filename, 'Windows-1251'));
 
-        return \Redirect::to('lections/'.$id);
+            return back();
         }
 
         return $this->index();
@@ -196,39 +294,12 @@ class HomeController extends Controller
     public function deleteTableRecord($id, Request $request)
     {
         if (\Auth::check()) {
-        $abc = $request->get('name', -1);
-        $delrec = Addmat::findorFail($request->get('id', '-1'));
-        $delrec->delete();
-        \File::delete(public_path().'/gruntFiles/addmats/'.(mb_convert_encoding($abc, 'Windows-1251')));
+            $abc = $request->get('name', -1);
+            $delrec = Addmat::findorFail($id);
+            $delrec->delete();
+            \File::delete(public_path().'/gruntFiles/addmats/'.(mb_convert_encoding($abc, 'Windows-1251')));
 
-        return \Redirect::to('lections/'.$id);
-        }
-
-        return $this->index();
-    }
-
-    public function changeLecDesc ($id, Request $request)
-    {
-        if (\Auth::check()) {
-        $newLecDesc = $request->get('comment', -1);
-
-        $desc = Lection::findorFail($id);
-        $desc->ldesc = $newLecDesc;
-        $desc->save();
-        return \Redirect::to('lections/'.$id);
-        }
-
-        return $this->index();
-    }
-    public function changeVideoDesc ($id, Request $request)
-    {
-        if (\Auth::check()) {
-        $newVideoDesc = $request->get('comment', -1);
-
-        $desc = Video::findorFail($request->get('id', '-1'));
-        $desc->vdesc = $newVideoDesc;
-        $desc->save();
-        return \Redirect::to('lections/'.$id);
+            return back();
         }
 
         return $this->index();
@@ -252,3 +323,4 @@ class HomeController extends Controller
 //        }
 //        $refile = rearrange($_FILES['userfile']);
 
+//return \Redirect::to('course'.$id.'/lections');

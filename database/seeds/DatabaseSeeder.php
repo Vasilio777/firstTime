@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Lection;
 use App\Models\Addmat;
-use App\Models\Video;
 use App\Models\User;
 use App\Models\Course;
 
@@ -19,12 +18,10 @@ class DatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-         $this->call(UserTableSeeder::class);
-
+        $this->call(UserTableSeeder::class);
         $this->call(CoursesTableSeeder::class);
-         $this->call(LectionsTableSeeder::class);
-//         $this->call(AddmatsTableSeeder::class);
-//        $this->call(VideosTableSeeder::class);
+        $this->call(LectionsTableSeeder::class);
+        $this->call(AddmatsTableSeeder::class);
 
         Model::reguard();
     }
@@ -37,13 +34,21 @@ class UserTableSeeder extends Seeder {
             'isPrepod' => '1',
             'password' => Hash::make('nimda'),
         ]);
+        User::create([
+            'name' => 'Papka',
+            'email' => 'myemail@mail.ru',
+            'isPrepod' => '0',
+            'password' => Hash::make('papka'),
+        ]);
     }
 }
 class CoursesTableSeeder extends Seeder {
     public function run() {
         Course::create([
             'coursetitle' => 'Java',
-            'cdesc' => 'yaa yaah yaa yaah',
+            'cdesc' => 'Java — кроссплатформенный язык программирования с мощным набором библиотек практически на все случаи жизни.',
+            'requirements' => 'хорошо разобраться с ООП, в java эта парадигма - основа языка (класы, интерфейсы, абстрактные класы); изучить базовые классы для того, чтоб при написании программы вы не тратили много времени на поиск (работа с файлами, с сетью, написание ГУИ, сортировки, работа с БД); освоить обработку ошибок и работу с потоками.',
+            'forWhom' => 'Хотите стать java юниором с уклоном к веб - не проблема!',
             'image' => 'Java.png',
         ]);
         Course::create([
@@ -90,45 +95,28 @@ class LectionsTableSeeder extends Seeder
         //DB::table('lections')->truncate();  // Truncate чистит ID!!! Не чистит форейн-кеи; поменять на delete, если придётся после продакшна пересидить.
         Lection::create([
             'idcourse' => '1',
-            'ltitle' => 'Лекция №1',
-            'ldesc' => 'ABRAKADAMBRA в совокупности с НУ ОЧЕНЬ ОЧЕНЬ ОЧЕНЬНУ ОЧЕНЬ ОЧЕНЬ ОЧЕНЬ НУ ОЧЕНЬ ОЧЕНЬ ОЧЕНЬ НУ ОЧЕНЬ ОЧЕНЬ ОЧЕНЬ НУ ОЧЕНЬ ОЧЕНЬ ОЧЕНЬ ДЛИННЫМ ОПИСАНИЕМ'
+            'ltitle' => 'IDE_Mac.mp4',
+            'ldesc' => 'Лекция написана простым и доступным языком, без книжной зауми и академичности. При этом, она содержит минимум воды — все кратко и по делу.'
         ]);
         Lection::create([
             'idcourse' => '1',
-            'ltitle' => 'Лекция №2',
-            'ldesc' => '222ABRAKADAMBRA2',
+            'ltitle' => 'filisdd.mpeg',
+            'ldesc' => 'Читайте эту лекцию, получайте все необходимые теоретические знания и когда освоите необходимый минимум, приступайте к практике.',
         ]);
     }
 }
-//class VideosTableSeeder extends Seeder
-//{
-//    public function run()
-//    {
-//        Video::create([
-//            'idvlec' => '1',
-//            'vtitle' => 'Life is strange.mpeg',
-//            'vdesc' => 'ЙОХОХОХОafafaafafafa fafafafafaf gjedo dadlfl mhlafal lndawndllnuaw awoihawl ndaw.',
-//        ]);
-//        Video::create([
-//            'idvlec' => '1',
-//            'vtitle' => 'Harlem Shake (в армии).mpeg',
-//            'vdesc' => 'двадвадваЙОХОХОХОafaafafafafafafafafafafffffffffffffffffffffafafafa.',
-//        ]);
-//    }
-//}
-//class AddmatsTableSeeder extends Seeder {
-//    public function run() {
-//        Addmat::create([
-//            'idaddlec' => '1',
-//            'addtitle' => 'Mosty тит нач 4к.doc',
-//        ]);
-//        Addmat::create([
-//            'idaddlec' => '2',
-//            'addtitle' => 'Мосты IV_1.docx',
-//        ]);
-//        Addmat::create([
-//            'idaddlec' => '2',
-//            'addtitle' => 'СИС правл..pdf',
-//        ]);
-//    }
-//}
+class AddmatsTableSeeder extends Seeder
+{
+    public function run()
+    {
+        //DB::table('lections')->truncate();  // Truncate чистит ID!!! Не чистит форейн-кеи; поменять на delete, если придётся после продакшна пересидить.
+        Addmat::create([
+            'idaddlec' => '1',
+            'addtitle' => 'Лекция 1. Encoding.pptx',
+        ]);
+        Addmat::create([
+            'idaddlec' => '1',
+            'addtitle' => 'Лекция 1. Encoding.xps',
+        ]);
+    }
+}

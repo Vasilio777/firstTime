@@ -11,7 +11,6 @@
 |
 */
 
-
 Route::get('/',  'WelcomeController@index');
 
 
@@ -35,12 +34,16 @@ Route::get('/', ['as' => 'home', 'uses' => 'HomeController@index']);
 // Список курсов, добавление курса, добавление лого
 Route::get('courses', ['as' => 'courses', 'uses' => 'HomeController@courses']);
 Route::get('/courses/newcourse', 'HomeController@newcourse');
+
 Route::post('courses/addCourse', ['as' => 'addCourse', 'uses' => 'HomeController@addCourse']);
 Route::post('/courses/addLogo', 'HomeController@addLogo');
+Route::post('lections/{id}/changeCourseDesc', 'HomeController@changeCourseDesc');
+Route::post('lections/{id}/changeCourseReq', 'HomeController@changeCourseReq');
+Route::post('lections/{id}/changeCourseWhom', 'HomeController@changeCourseWhom');
 
 Route::get('course{id}/lections', ['as' => 'lections', 'uses' => 'HomeController@lections']);
 Route::post('course{id}/addLection', ['as' => 'addLection', 'uses' => 'HomeController@addLection']);
-
+Route::post('course/{id}/deleteLection', 'HomeController@deleteLection');
 
 // Отображение контента выбранной лекции
 Route::get('lections/{id}', ['as' => 'chosenlections', 'uses' => 'HomeController@chosenlections']);
@@ -54,8 +57,9 @@ Route::post('lections/{id}/addVideo', 'HomeController@addVideo');
 Route::post('lections/{id}/removeVideo', 'HomeController@deleteVideo');
 
 
-// Изменение описания лекций/видео
+// Изменение описания лекций/видео  --(lections / chosenlections)--
 Route::post('lections/{id}/changeLecDesc', 'HomeController@changeLecDesc');
-Route::post('lections/{id}/changeVideoDesc', 'HomeController@changeVideoDesc');
+//Route::post('lections/{id}/changeVideoDesc', 'HomeController@changeVideoDesc');
+
 
 //Route::post('lections/{id}/incremento', 'HomeController@incremVideo');

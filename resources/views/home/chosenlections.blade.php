@@ -12,21 +12,23 @@
 
 @section('lections')
 
-    <div id="baseUl">
+    <div>
         <ul>
             <li>
-                <span>{{ $chosenlections->ltitle }}</span>
+              {{ $chosenlections->ltitle }}
+            </li>
+
+            <li>
+               {{  $chosenlections->ldesc }}
             </li>
         </ul>
 
-        <br>
-        <div id="ldesc">
-            <div>{{  $chosenlections->ldesc }}</div>
+        <div>
 
             @if ($usachek == 1)
                 <button class="button buttonLecChange" type="submit">Редактирование описания</button>
 
-                <form class="changeLecForm" action="{{ action('HomeController@changeLecDesc', ['id' => $chosenlections->id]) }}" method="post">
+                <form style="display: none;" class="changeLecForm" action="{{ action('HomeController@changeLecDesc', ['id' => $chosenlections->id]) }}" method="post">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <textarea name="comment" rows="4">{{ $chosenlections->ldesc }}</textarea>
                     <div class="divCenterButton"> <button class="button buttonRed" type="submit">Изменить описание</button> </div>
@@ -40,18 +42,19 @@
 
 @section('buttons')
 
-    <ul id="otherContent" class="accordion">
+    <ul class="accordion">
         <!--        ВИДЕО  ------------------------------------------------>
         <li>
-            <div class="link">Видеоматериалы</div>
+            <div class="link">
+                Видеоматериалы
+            </div>
 
             <ul class="submenu">
 
                 @foreach($videos as $index => $video)
                     @if( $video->idvlec == $chosenlections->id)
                         <li>
-                            <div class="mainOtherContent">
-
+                            <div>
                                 <video controls="controls">
                                     <source src="{{ URL::asset('gruntFiles/videos/'.$video->vtitle) }}" type='video/ogg; codecs="theora, vorbis"'>
                                     <source src="{{ URL::asset('gruntFiles/videos/'.$video->vtitle) }}" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
@@ -61,7 +64,7 @@
                                 <div class="aboutVideo">
                                     <span class="vtitle">{{ substr($video->vtitle, 0, strripos($video->vtitle, '.')) }}</span>
 
-                                    <br>
+
                                     <span class="vdesc">{{ $video->vdesc }}</span>
 
                                     @if ($usachek == 1)
@@ -97,8 +100,7 @@
 
                 @if ($usachek == 1)
                     <li>
-                        <div class="mainOtherContent">
-
+                        <div>
                             <form id="add_video" action="{{ action('HomeController@addVideo', ['id' => $chosenlections->id]) }}" method="post" enctype="multipart/form-data">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <input {{--}}multiple="multiple"--}} name="videofile{{--[]--}}" type="file">
@@ -113,7 +115,9 @@
 
         <!--          МЕТОДИЧКА --------------------------------------->
         <li>
-            <div class="link">Методические указания</div>
+            <div class="link">
+                Методические указания
+            </div>
 
             <ul class="submenu">
 
@@ -140,7 +144,6 @@
                 @if ($usachek == 1)
                     <li>
                         <div class="mainOtherContent">
-
                             <form id="add_method" action="{{ action('HomeController@addTableRecord', ['id' => $chosenlections->id]) }}" method="post" enctype="multipart/form-data">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <input {{--}}multiple="multiple"--}} name="userfile{{--[]--}}" type="file">
@@ -149,26 +152,6 @@
                         </div>
                     </li>
                 @endif
-
-            </ul>
-        </li>
-
-        <!--           ИСХОДНИКИ  ---------------------------------------->
-        <li>
-            <div class="link">Исходные данные</div>
-
-            <ul class="submenu">
-                <li>
-                    <div class="mainOtherContent">
-                    bbaabab
-                    </div>
-                </li>
-
-                <li>
-                    <div class="mainOtherContent">
-                    2bababab
-                    </div>
-                </li>
             </ul>
         </li>
     </ul>
